@@ -34,8 +34,8 @@ def load_json_file_to_dataset(file_path):
     })
 
 
-train_dataset = load_json_file_to_dataset("train1.json")
-validation_dataset = load_json_file_to_dataset("validation1.json")
+train_dataset = load_json_file_to_dataset("new_train.json")
+validation_dataset = load_json_file_to_dataset("validation.json")
 
 
 # 定义预处理函数
