@@ -58,8 +58,8 @@ class TextSummaryDataset(Dataset):
 # 数据加载器
 def collate_fn(batch):
     texts, summaries = zip(*batch)
-    text_encodings = tokenizer(texts, padding=True, truncation=True, return_tensors='pt')
-    summary_encodings = tokenizer(summaries, padding=True, truncation=True, return_tensors='pt')
+    text_encodings = tokenizer(list(texts), padding=True, truncation=True, return_tensors='pt', add_special_tokens=True)
+    summary_encodings = tokenizer(list(summaries), padding=True, truncation=True, return_tensors='pt', add_special_tokens=True)
     return text_encodings.input_ids, summary_encodings.input_ids
 
 
