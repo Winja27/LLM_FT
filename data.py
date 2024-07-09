@@ -16,8 +16,8 @@ validation_data = [
 ]
 
 # 生成大量数据
-train_data_large = train_data * 500
-validation_data_large = validation_data * 10
+train_data_large = train_data * 1000
+validation_data_large = validation_data * 100
 
 # 保存到JSON文件
 with open('train1.json', 'w', encoding='utf-8') as f:

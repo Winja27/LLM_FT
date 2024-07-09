@@ -3,12 +3,15 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import json
-from transformers import AutoTokenizer
+from transformers import GPT2Tokenizer
 
-# 加载预训练的tokenizer
-tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+# 加载预训练的GPT2 tokenizer，并指定填充符
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+tokenizer.pad_token = tokenizer.eos_token  # 使用eos_token作为填充符
+tokenizer.bos_token = tokenizer.eos_token  # 使用eos_token作为开始符
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
+
 
 # Transformer模型定义
 class TransformerModel(nn.Module):
@@ -72,8 +75,13 @@ output_dim = tokenizer.vocab_size
 model = TransformerModel(input_dim, output_dim)
 
 # 损失函数和优化器
+# 确保损失函数忽略填充的部分
 criterion = nn.CrossEntropyLoss(ignore_index=tokenizer.pad_token_id)
-optimizer = optim.Adam(model.parameters(), lr=0.0005)
+
+optimizer = optim.Adam(model.parameters(), lr=0.00001)
+
+total_params = sum(p.numel() for p in model.parameters())
+print(f'Total parameters: {total_params}')
 
 
 # 训练与评估函数
@@ -87,9 +95,11 @@ def train(model, iterator, optimizer, criterion, clip):
 
         optimizer.zero_grad()
 
+        # Shift trg for input and output
         output = model(src, trg[:, :-1])
         output_dim = output.shape[-1]
 
+        # Flatten output and trg for loss calculation
         output = output.contiguous().view(-1, output_dim)
         trg = trg[:, 1:].contiguous().view(-1)
 
@@ -129,9 +139,8 @@ def evaluate(model, iterator, criterion):
 
 
 # 训练过程
-N_EPOCHS = 50
+N_EPOCHS = 3
 CLIP = 1
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = model.to(device)
 
 best_valid_loss = float('inf')

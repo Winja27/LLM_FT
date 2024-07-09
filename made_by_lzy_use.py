@@ -1,10 +1,12 @@
 import torch
 from torch import nn
-from transformers import AutoTokenizer
+from transformers import GPT2Tokenizer
 
-# 加载预训练的tokenizer
-tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-
+# 加载预训练的GPT2 tokenizer，并指定填充符和其他特殊标记
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+tokenizer.pad_token = tokenizer.eos_token  # 使用eos_token作为填充符
+tokenizer.bos_token = tokenizer.eos_token  # 使用eos_token作为开始符
+tokenizer.eos_token_id = tokenizer.eos_token_id
 
 # Transformer模型定义
 class TransformerModel(nn.Module):
@@ -32,7 +34,6 @@ class TransformerModel(nn.Module):
         output = self.fc_out(output)
         return output
 
-
 # 加载训练好的模型
 input_dim = tokenizer.vocab_size
 output_dim = tokenizer.vocab_size
@@ -42,29 +43,32 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = model.to(device)
 model.eval()
 
-
 # 生成摘要函数
-def generate_summary(model, tokenizer, text, max_length=50):
+def generate_summary(model, tokenizer, text, max_length=100):
     model.eval()
     with torch.no_grad():
         input_ids = tokenizer.encode(text, return_tensors='pt').to(device)
+        print(f"Input text: {text}")
+        print(f"Input IDs: {input_ids}")
+
         summary_ids = torch.full((1, max_length), tokenizer.pad_token_id, dtype=torch.long).to(device)
-        summary_ids[0, 0] = tokenizer.cls_token_id  # Assuming CLS token is used to start the sequence
+        summary_ids[0, 0] = tokenizer.eos_token_id  # 使用eos_token_id作为开始符
 
         for i in range(1, max_length):
             outputs = model(input_ids, summary_ids[:, :i])
             next_token_logits = outputs[0, -1, :]
             next_token_id = next_token_logits.argmax(dim=-1).item()
             summary_ids[0, i] = next_token_id
-            if next_token_id == tokenizer.sep_token_id:  # Assuming SEP token is used to end the sequence
+
+            # 打印中间结果进行调试
+            print(f"Step {i}, Next token id: {next_token_id}, Token: {tokenizer.decode([next_token_id])}")
+            if next_token_id == tokenizer.eos_token_id:  # Assuming EOS token is used to end the sequence
                 break
 
         summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
     return summary
 
-
 # 使用示例文本生成摘要
 text = "在一个风雨交加的夜晚，年轻的侦探约翰·史密斯踏入了被称为幽灵屋的古老庄园。屋内，一切看似平常，但约翰能感觉到一股不寻常的气息。他的直觉告诉他，这里发生过些什么。墙上的旧画像，仿佛在诉说着过去的秘密，而每一道门后，都可能隐藏着一个故事。约翰小心翼翼地走过长长的走廊，他的脚步声在空旷的房间中回响。"
-
 summary = generate_summary(model, tokenizer, text)
-print("摘要："+summary)
+print("摘要：" + summary)
