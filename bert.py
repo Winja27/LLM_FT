@@ -1,6 +1,3 @@
-'''如果你希望使用 BERT 模型进行文本摘要任务，需要理解一点：BERT 模型本身并不是为生成任务设计的，它是一个预训练的语言模型，通常用于分类和标记任务。因此，直接使用 BertForConditionalGeneration 是不正确的，因为它并不支持生成任务。
-
-对于生成任务（如文本摘要），一种更适合的做法是使用 EncoderDecoderModel 类，该类可以将一个编码器（如BERT）和一个解码器（如BERT或者GPT）结合起来，用于生成型任务。在 Hugging Face Transformers 中，这种模型通常称为 BERT2BERT 或者 BART 等。'''
 import torch
 from transformers import BertTokenizer, EncoderDecoderModel, Trainer, TrainingArguments
 from datasets import Dataset, load_dataset
@@ -45,17 +42,20 @@ def preprocess_function(examples):
 
     global tokenizer, device
 
-    model_inputs = tokenizer(inputs, max_length=128, truncation=True, padding="max_length", return_tensors="pt").to(
-        device)
-    labels = tokenizer(targets, max_length=128, truncation=True, padding="max_length", return_tensors="pt").to(device)
+    # 添加 attention_mask
+    model_inputs = tokenizer(inputs, max_length=128, truncation=True, padding="max_length", return_tensors="pt")
+    labels = tokenizer(targets, max_length=128, truncation=True, padding="max_length", return_tensors="pt")
 
     bos_token_id = tokenizer.bos_token_id
     decoder_input_ids = torch.full((labels.input_ids.shape[0], 128),
-                                   bos_token_id if bos_token_id is not None else tokenizer.pad_token_id).to(device)
+                                   bos_token_id if bos_token_id is not None else tokenizer.pad_token_id)
 
     model_inputs["decoder_input_ids"] = decoder_input_ids
+    model_inputs["labels"] = labels.input_ids
+    model_inputs["attention_mask"] = model_inputs["attention_mask"]  # 添加 attention_mask
+    model_inputs["decoder_attention_mask"] = labels["attention_mask"]  # 添加 decoder_attention_mask
 
-    labels[labels.input_ids == tokenizer.pad_token_id] = -100
+    labels.input_ids[labels.input_ids == tokenizer.pad_token_id] = -100
     model_inputs["labels"] = labels.input_ids
 
     return model_inputs
@@ -75,6 +75,7 @@ training_args = TrainingArguments(
     num_train_epochs=12,
     weight_decay=0.01
 )
+
 # 创建Trainer对象
 trainer = Trainer(
     model=model,
