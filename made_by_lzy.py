@@ -78,7 +78,7 @@ model = TransformerModel(input_dim, output_dim)
 # 确保损失函数忽略填充的部分
 criterion = nn.CrossEntropyLoss(ignore_index=tokenizer.pad_token_id)
 
-optimizer = optim.Adam(model.parameters(), lr=0.00001)
+optimizer = optim.Adam(model.parameters(), lr=0.00005)
 
 total_params = sum(p.numel() for p in model.parameters())
 print(f'Total parameters: {total_params}')

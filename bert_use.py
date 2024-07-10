@@ -15,7 +15,7 @@ model.to(device)
 model.config.decoder_start_token_id = tokenizer.convert_tokens_to_ids("[CLS]")
 
 # 准备输入文本并生成摘要
-input_text = ("在一个风雨交加的夜晚，年轻的侦探约翰·史密斯踏入了被称为幽灵屋的古老庄园。屋内，一切看似平常，但约翰能感觉到一股不寻常的气息。他的直觉告诉他，这里发生过些什么。墙上的旧画像，仿佛在诉说着过去的秘密，而每一道门后，都可能隐藏着一个故事。约翰小心翼翼地走过长长的走廊，他的脚步声在空旷的房间中回响。")
+input_text =("""澳大利亚央行将利率降至纪录低点,以应对疲软的经济前景,并遏制澳元进一步走强。05/0513:37|评论(0)A+澳大利亚央行周二发布声明称,将关键利率由2.25%调降至2%,符合此前交易员及接受彭博调查的29位经济学家中25位的预期。据彭博社报道,上月澳央行官员曾警告,矿业之外的行业投资可能下滑。澳大利亚政府不太可能推出新的刺激措施,来扶助受本币升值和铁矿石价格下跌打击而低于潜在水平的经济增长。“鉴于大宗商品价格下跌,矿业投资还可能有低于当前预期的风险,”预计到降息的澳新银行高级经济学家FelicityEmmett在决议公布前编写的研究报告中称。他表示此次决议可能反映出“央行经济增长预估轨迹有所下调”。""")
 inputs = tokenizer(input_text, max_length=128, truncation=True, padding="max_length", return_tensors="pt").to(device)
 
 # 使用模型生成摘要
@@ -27,7 +27,6 @@ summary_ids = model.generate(
     length_penalty=2.0,
     early_stopping=True
 )
-
 # 解码生成的摘要
 generated_summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
 print("Generated Summary:", generated_summary)

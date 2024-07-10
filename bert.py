@@ -69,13 +69,12 @@ tokenized_validation_dataset = validation_dataset.map(preprocess_function, batch
 training_args = TrainingArguments(
     output_dir="./model/bert-base-chinese-summary-model",
     evaluation_strategy="epoch",
-    learning_rate=2e-5,
-    per_device_train_batch_size=16,
-    per_device_eval_batch_size=16,
-    num_train_epochs=15,
-    weight_decay=0.01,
+    learning_rate=3e-5,
+    per_device_train_batch_size=32,
+    per_device_eval_batch_size=32,
+    num_train_epochs=12,
+    weight_decay=0.01
 )
-
 # 创建Trainer对象
 trainer = Trainer(
     model=model,
