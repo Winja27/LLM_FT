@@ -5,7 +5,7 @@ from transformers import MT5Tokenizer, MT5ForConditionalGeneration
 # 加载模型和分词器
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
-model_name = "./model/mt5-summary-model"
+model_name = "./model/mt5-summary-model0"
 tokenizer = MT5Tokenizer.from_pretrained(model_name)
 model = MT5ForConditionalGeneration.from_pretrained(model_name).to(device)
 
@@ -29,7 +29,7 @@ def summarize_text(text):
     return summary
 
 # 读取 JSON 文件
-input_file = 'input.json'
+input_file = 'huozhe_cut.json'
 output_file = 'output.json'
 
 with open(input_file, 'r', encoding='utf-8') as f:

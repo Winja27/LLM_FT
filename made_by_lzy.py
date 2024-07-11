@@ -63,8 +63,8 @@ def collate_fn(batch):
     return text_encodings.input_ids, summary_encodings.input_ids
 
 
-train_dataset = TextSummaryDataset('train1.json')
-val_dataset = TextSummaryDataset('validation1.json')
+train_dataset = TextSummaryDataset('new_train.json')
+val_dataset = TextSummaryDataset('validation.json')
 
 train_loader = DataLoader(train_dataset, batch_size=8, collate_fn=collate_fn, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=8, collate_fn=collate_fn)
@@ -139,7 +139,7 @@ def evaluate(model, iterator, criterion):
 
 
 # 训练过程
-N_EPOCHS = 3
+N_EPOCHS = 10
 CLIP = 1
 model = model.to(device)
 
