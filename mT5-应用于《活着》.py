@@ -29,7 +29,7 @@ def summarize_text(text):
     return summary
 
 # 读取 JSON 文件
-input_file = 'huozhe_cut.json'
+input_file = '《活着》-部分.json'
 output_file = 'output.json'
 
 with open(input_file, 'r', encoding='utf-8') as f:

@@ -31,7 +31,7 @@ def load_json_file_to_dataset(file_path):
     })
 
 
-train_dataset = load_json_file_to_dataset("new_train.json")
+train_dataset = load_json_file_to_dataset("训练数据（新）.json")
 validation_dataset = load_json_file_to_dataset("validation.json")
 
 

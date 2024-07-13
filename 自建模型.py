@@ -63,7 +63,7 @@ def collate_fn(batch):
     return text_encodings.input_ids, summary_encodings.input_ids
 
 
-train_dataset = TextSummaryDataset('new_train.json')
+train_dataset = TextSummaryDataset('训练数据（新）.json')
 val_dataset = TextSummaryDataset('validation.json')
 
 train_loader = DataLoader(train_dataset, batch_size=8, collate_fn=collate_fn, shuffle=True)

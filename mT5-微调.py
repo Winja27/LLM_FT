@@ -10,7 +10,7 @@ model_name = "./model/mt5-small"
 tokenizer = MT5Tokenizer.from_pretrained(model_name)
 model = MT5ForConditionalGeneration.from_pretrained(model_name).to(device)
 
-with open('new_train.json', 'r', encoding='utf-8') as f:
+with open('训练数据（新）.json', 'r', encoding='utf-8') as f:
     train_data = json.load(f)
 
 with open('validation.json', 'r', encoding='utf-8') as f:
